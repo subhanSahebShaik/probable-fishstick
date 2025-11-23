@@ -1,4 +1,4 @@
-const BASE = "http://127.0.0.1:8000/api/thread";
+const BASE = "https://probable-fishstick-ff6o.onrender.com/api/thread";
 
 export async function getThreadNodes() {
     return fetch(`${BASE}/nodes/`).then(r => r.json());
