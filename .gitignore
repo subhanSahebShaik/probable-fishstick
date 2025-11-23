@@ -1,0 +1,31 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# --- Django ---
+staticfiles/
+media/
+*.secret
+config.conf
+threadModel/config.conf
+
+# --- Node / React ---
+node_modules/
+thread-model/node_modules/
+build/
+dist/
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
