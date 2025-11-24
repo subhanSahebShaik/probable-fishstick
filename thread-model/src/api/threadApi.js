@@ -1,4 +1,4 @@
-export const BASE = "http://127.0.0.1:8000/api";
+export const BASE = "https://probable-fishstick-ff6o.onrender.com/api";
 
 function authHeader() {
     return {
