@@ -16,6 +16,7 @@ export default function AddNodeModal({ open, close, refresh }) {
         event_name: "",
         event_type: "DEBIT",
         amount: "",
+        balance: "",
         description: "",
         is_returnable: false,
         return_amount: 0,
@@ -29,6 +30,7 @@ export default function AddNodeModal({ open, close, refresh }) {
                 event_name: "",
                 event_type: "DEBIT",
                 amount: "",
+                balance: "",
                 description: "",
                 is_returnable: false,
                 return_amount: 0,
@@ -54,7 +56,6 @@ export default function AddNodeModal({ open, close, refresh }) {
             <DialogTitle>Add Node</DialogTitle>
 
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-
                 <TextField
                     label="Event Name"
                     value={form.event_name}
@@ -79,6 +80,14 @@ export default function AddNodeModal({ open, close, refresh }) {
                 />
 
                 <TextField
+                    label="Balance"
+                    type="number"
+                    value={form.balance}
+                    onChange={e => change("balance", e.target.value)}
+                    helperText="Enter current balance for this medium after this event"
+                />
+
+                <TextField
                     label="Description"
                     multiline
                     rows={3}
@@ -86,7 +95,6 @@ export default function AddNodeModal({ open, close, refresh }) {
                     onChange={e => change("description", e.target.value)}
                 />
 
-                {/* RETURNABLE FIELDS ONLY FOR DEBIT */}
                 {isDebit && (
                     <>
                         <FormControlLabel
@@ -123,7 +131,6 @@ export default function AddNodeModal({ open, close, refresh }) {
                         )}
                     </>
                 )}
-
             </DialogContent>
 
             <DialogActions>

@@ -30,7 +30,12 @@ export default function RightPanel({ node, edge, onEditNode, onEditEdge }) {
                                 <Typography sx={{ mt: 2 }}>
                                     <b>Description:</b>
                                     <br />
-                                    {node.description}
+                                    {node.description.split("\n").map((line, idx) => (
+                                        <span key={idx}>
+                                            {line}
+                                            <br />
+                                        </span>
+                                    ))}
                                 </Typography>
                             )}
                         </>

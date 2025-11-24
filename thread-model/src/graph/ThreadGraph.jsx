@@ -4,13 +4,13 @@ import dagre from "dagre";
 import "reactflow/dist/style.css";
 import { getThreadNodes, getThreadEdges } from "../api/threadApi";
 import ThreadNodeComponent from "./ThreadNode";
+import ThreadEdge from "./ThreadEdge";
+
+const edgeTypes = { threadEdge: ThreadEdge };
+const nodeTypes = { threadNode: ThreadNodeComponent };
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-const nodeTypes = {
-    threadNode: ThreadNodeComponent,
-};
 
 export default function ThreadGraph({ onSelectNode, onSelectEdge }) {
     const [nodes, setNodes] = useState([]);
@@ -49,7 +49,7 @@ export default function ThreadGraph({ onSelectNode, onSelectEdge }) {
             id: edge.id,
             source: edge.from_node,
             target: edge.to_node,
-            animated: true,
+            type: "threadEdge",
         }));
 
         setNodes(flowNodes);
@@ -63,12 +63,17 @@ export default function ThreadGraph({ onSelectNode, onSelectEdge }) {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onNodeClick={(evt, node) => onSelectNode(node)}
             onEdgeClick={(evt, edge) => onSelectEdge(edge)}
             fitView
         >
             <Background variant={BackgroundVariant.Cross} gap={25} size={3} />
-            <MiniMap />
+            <MiniMap nodeColor={(node) => {
+                // node.data.event_type should exist
+                if (!node.data) return "#eee"; // default
+                return node.data.event_type === "CREDIT" ? "#d2ffe0" : "#ffe0e0"; // green for credit, red for debit
+            }} />
             <Controls />
         </ReactFlow>
     );

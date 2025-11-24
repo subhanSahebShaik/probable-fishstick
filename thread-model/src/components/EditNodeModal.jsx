@@ -15,6 +15,7 @@ export default function EditNodeModal({ node, close, refresh }) {
         event_name: node.event_name,
         event_type: node.event_type,
         amount: node.amount,
+        balance: node.balance ?? 0,
         description: node.description ?? "",
         is_returnable: node.is_returnable,
         return_amount: node.return_amount ?? 0,
@@ -31,6 +32,8 @@ export default function EditNodeModal({ node, close, refresh }) {
         refresh();
         close();
     }
+
+    const isDebit = form.event_type === "DEBIT";
 
     return (
         <Dialog open={true} onClose={close} maxWidth="sm" fullWidth>
@@ -61,6 +64,14 @@ export default function EditNodeModal({ node, close, refresh }) {
                 />
 
                 <TextField
+                    label="Balance"
+                    type="number"
+                    value={form.balance}
+                    onChange={e => change("balance", e.target.value)}
+                    helperText="Update current balance for this medium after this event"
+                />
+
+                <TextField
                     label="Description"
                     multiline
                     rows={3}
@@ -68,7 +79,7 @@ export default function EditNodeModal({ node, close, refresh }) {
                     onChange={e => change("description", e.target.value)}
                 />
 
-                {form.event_type === "DEBIT" && (
+                {isDebit && (
                     <>
                         <FormControlLabel
                             control={
@@ -102,6 +113,7 @@ export default function EditNodeModal({ node, close, refresh }) {
                                     value={form.return_status}
                                     onChange={e => change("return_status", e.target.value)}
                                 >
+                                    <MenuItem value="NONE">Not Returnable</MenuItem>
                                     <MenuItem value="PENDING">Pending</MenuItem>
                                     <MenuItem value="PARTIAL">Partially Returned</MenuItem>
                                     <MenuItem value="CLEARED">Cleared</MenuItem>
