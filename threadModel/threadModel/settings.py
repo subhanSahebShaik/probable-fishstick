@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import configparser
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,18 +22,18 @@ config = configparser.ConfigParser(interpolation=None)
 config.read(BASE_DIR / "config.conf")
 
 
-def get_setting(section, key, env_name):
+def get_setting(section, key):
     """
     Try to load from environment first.
     If not found, fall back to config.conf.
     """
-    return os.getenv(env_name) or config.get(section, key, fallback=None)
+    return os.getenv(key) or config.get(section, key, fallback=None)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_setting("django", "secret_key", "DJANGO_SECRET_KEY")
+SECRET_KEY = get_setting("django", "DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -50,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'threadApp',
+    "rest_framework",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -91,11 +94,11 @@ WSGI_APPLICATION = 'threadModel.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": get_setting("post_data", "dbname", "POST_DB_NAME"),
-        "USER": get_setting("post_data", "user", "POST_DB_USER"),
-        "PASSWORD": get_setting("post_data", "password", "POST_DB_PASSWORD"),
-        "HOST": get_setting("post_data", "host", "POST_DB_HOST"),
-        "PORT": get_setting("post_data", "port", "POST_DB_PORT"),
+        "NAME": get_setting("post_data", "POST_DB_NAME"),
+        "USER": get_setting("post_data", "POST_DB_USER"),
+        "PASSWORD": get_setting("post_data", "POST_DB_PASSWORD"),
+        "HOST": get_setting("post_data", "POST_DB_HOST"),
+        "PORT": get_setting("post_data", "POST_DB_PORT"),
     }
 }
 
@@ -144,3 +147,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}

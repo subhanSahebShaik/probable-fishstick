@@ -3,10 +3,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import ThreadNode, ThreadEdge
 from .serializers import ThreadNodeSerializer, ThreadEdgeSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
 
 
 # ======== THREAD NODES ========
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def thread_nodes(request):
     if request.method == "GET":
         nodes = ThreadNode.objects.all().order_by("-timestamp")
@@ -21,6 +24,7 @@ def thread_nodes(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def thread_node_detail(request, pk):
     try:
         node = ThreadNode.objects.get(pk=pk)
@@ -44,6 +48,7 @@ def thread_node_detail(request, pk):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def thread_edges(request):
     if request.method == "GET":
         edges = ThreadEdge.objects.all()
@@ -58,6 +63,7 @@ def thread_edges(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def thread_edge_detail(request, pk):
     try:
         edge = ThreadEdge.objects.get(pk=pk)
