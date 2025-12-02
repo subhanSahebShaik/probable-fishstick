@@ -28,9 +28,9 @@ export default function Login() {
         try {
             const res = await fetch(`${BASE}/auth/login/`, {
                 method: "POST",
-                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
+                credentials: "include",
             });
 
             if (res.status === 200) {

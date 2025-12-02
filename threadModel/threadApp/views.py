@@ -103,27 +103,27 @@ def cookie_login(request):
         return Response({"error": "Invalid credentials"}, status=400)
 
     refresh = RefreshToken.for_user(user)
+    access = refresh.access_token
 
-    response = Response({"success": True})
+    response = Response({"status": "ok"})
 
-    # access token
     response.set_cookie(
-        key="access_token",
-        value=str(refresh.access_token),
+        "access_token",
+        str(access),
         httponly=True,
         secure=True,
-        samesite="Lax",
+        samesite="None",
         path="/",
+        max_age=3600,
     )
-
-    # refresh token
     response.set_cookie(
-        key="refresh_token",
-        value=str(refresh),
+        "refresh_token",
+        str(refresh),
         httponly=True,
         secure=True,
-        samesite="Lax",
+        samesite="None",
         path="/",
+        max_age=24 * 3600,
     )
 
     return response
@@ -159,4 +159,4 @@ def cookie_refresh(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def auth_check(request):
-    return Response({"status": "ok"})
+    return Response({"ok": True})
