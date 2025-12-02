@@ -17,6 +17,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import theme from "./theme/DeepOcean";
 
+import { AuthProvider } from "./context/AuthContext";
+
 /**
  * App Component
  * -------------
@@ -36,45 +38,46 @@ export default function App() {
     <ThemeProvider theme={theme}>
       {/* Applies global dark theme, resets CSS, and activates Deep Ocean colors */}
       <CssBaseline />
-
-      <BrowserRouter>
-        {/* Top Navigation Bar (conditionally shows buttons based on path) */}
-        <NavBar
-          openAddNode={() => openAddNodeRef.current?.()}
-          openAddEdge={() => openAddEdgeRef.current?.()}
-        />
-
-        {/* Main Application Routing */}
-        <Routes>
-
-          {/* Login Page (public) */}
-          <Route path="/login" element={<Login />} />
-
-          {/* Dashboard (protected) */}
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
+      <AuthProvider>
+        <BrowserRouter>
+          {/* Top Navigation Bar (conditionally shows buttons based on path) */}
+          <NavBar
+            openAddNode={() => openAddNodeRef.current?.()}
+            openAddEdge={() => openAddEdgeRef.current?.()}
           />
 
-          {/* Thread Flow Visualization (protected) */}
-          <Route
-            path="/flow"
-            element={
-              <PrivateRoute>
-                <ThreadFlow
-                  openNodeModalRef={openAddNodeRef}
-                  openEdgeModalRef={openAddEdgeRef}
-                />
-              </PrivateRoute>
-            }
-          />
+          {/* Main Application Routing */}
+          <Routes>
 
-        </Routes>
-      </BrowserRouter>
+            {/* Login Page (public) */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Dashboard (protected) */}
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Thread Flow Visualization (protected) */}
+            <Route
+              path="/flow"
+              element={
+                <PrivateRoute>
+                  <ThreadFlow
+                    openNodeModalRef={openAddNodeRef}
+                    openEdgeModalRef={openAddEdgeRef}
+                  />
+                </PrivateRoute>
+              }
+            />
+
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

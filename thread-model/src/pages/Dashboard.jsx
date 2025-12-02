@@ -25,10 +25,22 @@ import { getThreadNodes, getThreadEdges } from "../api/threadApi";
 
 const COLORS = ["#64FFDA", "#FF6F61", "#38E6B8", "#F9A825", "#A277FF"];
 
+function useWindowSize() {
+    const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+    return size;
+}
+
 export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
+    const { width: windowWidth } = useWindowSize();
 
     useEffect(() => {
         async function load() {
@@ -116,13 +128,16 @@ export default function Dashboard() {
         boxShadow: "0 0 12px rgba(0,0,0,0.25)",
     };
 
+    // Chart widths
+    const chartWidth = windowWidth * 0.40;
+
     return (
         <Box sx={{ width: "100%", color: "#E6F1FF", p: 3 }}>
             <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
                 Dashboard Overview
             </Typography>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={3} padding={3} justifyContent="space-evenly">
 
                 {/* Credit vs Debit */}
                 <Grid item xs={12} md={4}>
@@ -131,23 +146,24 @@ export default function Dashboard() {
                             Credits vs Debits
                         </Typography>
 
-                        <PieChart width={300} height={280}>
-                            <Pie
-                                data={creditVsDebitData}
-                                cx="50%"
-                                cy="50%"
-                                label
-                                innerRadius={50}
-                                outerRadius={90}
-                                paddingAngle={5}
-                                dataKey="value"
-                            >
-                                {creditVsDebitData.map((entry, i) => (
-                                    <Cell key={i} fill={COLORS[i]} />
-                                ))}
-                            </Pie>
-                        </PieChart>
-
+                        <Box sx={{ height: 250, width: chartWidth }}>
+                            <PieChart width="100%" height={250}>
+                                <Pie
+                                    data={creditVsDebitData}
+                                    cx="50%"
+                                    cy="50%"
+                                    label
+                                    innerRadius={50}
+                                    outerRadius={90}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {creditVsDebitData.map((entry, i) => (
+                                        <Cell key={i} fill={COLORS[i]} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </Box>
                         <Typography sx={{ mt: 1 }}>
                             <b>Total Credit:</b> ₹{totalCredit}
                         </Typography>
@@ -164,14 +180,16 @@ export default function Dashboard() {
                             Monthly Trend
                         </Typography>
 
-                        <LineChart width={600} height={300} data={monthlyTrendData}>
-                            <CartesianGrid stroke="rgba(255,255,255,0.1)" />
-                            <XAxis dataKey="month" stroke="#A8B2D1" />
-                            <YAxis stroke="#A8B2D1" />
-                            <Tooltip />
-                            <Line dataKey="credit" stroke="#64FFDA" strokeWidth={2} />
-                            <Line dataKey="debit" stroke="#FF6F61" strokeWidth={2} />
-                        </LineChart>
+                        <Box sx={{ height: 300, width: chartWidth }}>
+                            <LineChart width="100%" height={300} data={monthlyTrendData}>
+                                <CartesianGrid stroke="rgba(255,255,255,0.1)" />
+                                <XAxis dataKey="month" stroke="#A8B2D1" />
+                                <YAxis stroke="#A8B2D1" />
+                                <Tooltip />
+                                <Line dataKey="credit" stroke="#64FFDA" strokeWidth={2} />
+                                <Line dataKey="debit" stroke="#FF6F61" strokeWidth={2} />
+                            </LineChart>
+                        </Box>
                     </Paper>
                 </Grid>
 
@@ -181,14 +199,15 @@ export default function Dashboard() {
                         <Typography variant="h6" sx={{ mb: 2 }}>
                             Returnable Money
                         </Typography>
-
-                        <BarChart width={500} height={300} data={returnableData}>
-                            <CartesianGrid stroke="rgba(255,255,255,0.1)" />
-                            <XAxis dataKey="name" stroke="#A8B2D1" />
-                            <YAxis stroke="#A8B2D1" />
-                            <Tooltip />
-                            <Bar dataKey="value" fill="#A277FF" radius={[5, 5, 0, 0]} />
-                        </BarChart>
+                        <Box sx={{ height: 300, width: chartWidth }}>
+                            <BarChart width="100%" height={300} data={returnableData}>
+                                <CartesianGrid stroke="rgba(255,255,255,0.1)" />
+                                <XAxis dataKey="name" stroke="#A8B2D1" />
+                                <YAxis stroke="#A8B2D1" />
+                                <Tooltip />
+                                <Bar dataKey="value" fill="#A277FF" radius={[5, 5, 0, 0]} />
+                            </BarChart>
+                        </Box>
                     </Paper>
                 </Grid>
 
@@ -199,9 +218,11 @@ export default function Dashboard() {
                             Graph Insights
                         </Typography>
 
-                        <Typography>Total Nodes: {stats.nodes}</Typography>
-                        <Typography>Total Edges: {stats.edges}</Typography>
-                        <Typography>Average Connections: {stats.ratio}</Typography>
+                        <Paper elevation={3} sx={card} style={{ width: chartWidth, height: 300 }}>
+                            <Typography>Total Nodes: {stats.nodes}</Typography>
+                            <Typography>Total Edges: {stats.edges}</Typography>
+                            <Typography>Average Connections: {stats.ratio}</Typography>
+                        </Paper>
                     </Paper>
                 </Grid>
 

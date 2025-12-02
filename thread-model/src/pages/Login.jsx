@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE } from "../api/threadApi";
+import { useAuth } from "../context/AuthContext";
 
 import {
     Box,
@@ -19,6 +20,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    const { setLoggedIn } = useAuth();
     const navigate = useNavigate();
 
     async function login() {
@@ -34,7 +36,8 @@ export default function Login() {
             });
 
             if (res.status === 200) {
-                navigate("/flow");
+                setLoggedIn(true);
+                navigate("/");
             } else {
                 setError("Invalid username or password");
             }
@@ -55,6 +58,11 @@ export default function Login() {
             }}
         >
             <Paper
+                component="form"             // <-- make Paper a form
+                onSubmit={(e) => {
+                    e.preventDefault();      // prevent full page reload
+                    login();                 // call your login function
+                }}
                 sx={{
                     p: 4,
                     width: 340,
@@ -94,6 +102,7 @@ export default function Login() {
 
                 <Button
                     fullWidth
+                    type="submit"
                     variant="contained"
                     sx={{
                         py: 1.4,

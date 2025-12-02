@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { BASE } from "../api/threadApi";
-import LoadingSpinner from "./LoadingSpinner";
+import { CircularProgress, Box } from "@mui/material";
 
 export default function PrivateRoute({ children }) {
     const [allowed, setAllowed] = useState(null);
@@ -14,7 +14,18 @@ export default function PrivateRoute({ children }) {
             .catch(() => setAllowed(false));
     }, []);
 
-    if (allowed === null) return <LoadingSpinner />;
+    if (allowed === null) return
+    <Box
+        sx={{
+            p: 3,
+            display: "flex",
+            height: "80vh",
+            justifyContent: "center",
+            alignItems: "center",
+        }}
+    >
+        <CircularProgress sx={{ color: "#64FFDA" }} />
+    </Box>;
 
     return allowed ? children : <Navigate to="/login" replace />;
 }

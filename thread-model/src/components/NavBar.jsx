@@ -9,13 +9,16 @@ import {
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { logout } from "../api/threadApi";
-import useAuthStatus from "../hooks/useAuthStatus";
+import { useAuth } from "../context/AuthContext";
 
 export default function NavBar({ openAddNode, openAddEdge }) {
     const location = useLocation();
     const navigate = useNavigate();
-    const loggedIn = useAuthStatus();
+    const { loggedIn } = useAuth();
     const path = location.pathname;
+
+    // avoid flicker before auth status loads
+    if (loggedIn === null) return null;
 
     const isDashboard = path === "/";
     const isFlow = path === "/flow";
