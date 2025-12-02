@@ -1,70 +1,66 @@
+import { apiFetch } from "./http";
+
 export const BASE = "https://probable-fishstick-ff6o.onrender.com/api";
 
-function authHeader() {
-    return {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("access")}`,
-    };
+// THREAD NODES
+export function getThreadNodes() {
+    return apiFetch(`${BASE}/thread/nodes/`);
 }
 
-
-export async function getThreadNodes() {
-    return fetch(`${BASE}/thread/nodes/`, {
-        headers: authHeader()
-    }).then(r => r.json());
-}
-
-export async function createThreadNode(data) {
-    return fetch(`${BASE}/thread/nodes/`, {
+export function createThreadNode(data) {
+    return apiFetch(`${BASE}/thread/nodes/`, {
         method: "POST",
-        headers: authHeader(),
         body: JSON.stringify(data)
-    }).then(r => r.json());
-}
-
-export async function updateThreadNode(id, data) {
-    return fetch(`${BASE}/thread/nodes/${id}/`, {
-        method: "PUT",
-        headers: authHeader(),
-        body: JSON.stringify(data)
-    }).then(r => r.json());
-}
-
-export async function deleteThreadNode(id) {
-    return fetch(`${BASE}/thread/nodes/${id}/`, {
-        method: "DELETE",
-        headers: authHeader()
     });
 }
 
-export async function getThreadEdges() {
-    return fetch(`${BASE}/thread/edges/`, { headers: authHeader() }).then(r => r.json());
-}
-
-export async function createThreadEdge(data) {
-    return fetch(`${BASE}/thread/edges/`, {
-        method: "POST",
-        headers: authHeader(),
-        body: JSON.stringify(data)
-    }).then(r => r.json());
-}
-
-export async function updateThreadEdge(id, data) {
-    return fetch(`${BASE}/thread/edges/${id}/`, {
+export function updateThreadNode(id, data) {
+    return apiFetch(`${BASE}/thread/nodes/${id}/`, {
         method: "PUT",
-        headers: authHeader(),
         body: JSON.stringify(data)
-    }).then(r => r.json());
-}
-
-export async function deleteThreadEdge(id) {
-    return fetch(`${BASE}/thread/edges/${id}/`, {
-        method: "DELETE",
-        headers: authHeader()
     });
 }
 
+export function deleteThreadNode(id) {
+    return apiFetch(`${BASE}/thread/nodes/${id}/`, {
+        method: "DELETE"
+    });
+}
+
+// THREAD EDGES
+export function getThreadEdges() {
+    return apiFetch(`${BASE}/thread/edges/`);
+}
+
+export function createThreadEdge(data) {
+    return apiFetch(`${BASE}/thread/edges/`, {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
+}
+
+export function updateThreadEdge(id, data) {
+    return apiFetch(`${BASE}/thread/edges/${id}/`, {
+        method: "PUT",
+        body: JSON.stringify(data)
+    });
+}
+
+export function deleteThreadEdge(id) {
+    return apiFetch(`${BASE}/thread/edges/${id}/`, {
+        method: "DELETE"
+    });
+}
+
+// LOGOUT — expires cookies
 export function logout() {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    // OPTIONAL: tell backend to expire refresh token (if implemented)
+    fetch(`${BASE}/auth/logout/`, {
+        method: "POST",
+        credentials: "include"
+    }).catch(() => { });
+
+    // Remove cookies client side
+    document.cookie = "access_token=; Max-Age=0; path=/;";
+    document.cookie = "refresh_token=; Max-Age=0; path=/;";
 }

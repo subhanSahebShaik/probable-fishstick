@@ -1,18 +1,14 @@
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Button from "@mui/material/Button";
+// AddNodeModal.jsx
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    TextField, MenuItem, Checkbox, FormControlLabel, Button
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import { createThreadNode } from "../api/threadApi";
 
 export default function AddNodeModal({ open, close, refresh }) {
 
-    const [form, setForm] = useState({
+    const emptyForm = {
         event_name: "",
         event_type: "DEBIT",
         amount: "",
@@ -20,42 +16,32 @@ export default function AddNodeModal({ open, close, refresh }) {
         description: "",
         is_returnable: false,
         return_amount: 0,
-        return_status: "NONE",
-    });
+        return_status: "PENDING",
+        returned_amount: 0,
+    };
 
-    // Reset on open
+    const [form, setForm] = useState(emptyForm);
+
     useEffect(() => {
-        if (open) {
-            setForm({
-                event_name: "",
-                event_type: "DEBIT",
-                amount: "",
-                balance: "",
-                description: "",
-                is_returnable: false,
-                return_amount: 0,
-                return_status: "NONE",
-            });
-        }
+        if (open) setForm(emptyForm);
     }, [open]);
 
-    function change(k, v) {
-        setForm({ ...form, [k]: v });
-    }
+    const change = (k, v) => setForm({ ...form, [k]: v });
 
-    async function submit() {
+    const submit = async () => {
         await createThreadNode(form);
         refresh();
         close();
-    }
+    };
 
     const isDebit = form.event_type === "DEBIT";
 
     return (
         <Dialog open={open} onClose={close} maxWidth="sm" fullWidth>
-            <DialogTitle>Add Node</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 600 }}>Add Node</DialogTitle>
 
-            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
                 <TextField
                     label="Event Name"
                     value={form.event_name}
@@ -84,7 +70,6 @@ export default function AddNodeModal({ open, close, refresh }) {
                     type="number"
                     value={form.balance}
                     onChange={e => change("balance", e.target.value)}
-                    helperText="Enter current balance for this medium after this event"
                 />
 
                 <TextField
@@ -117,12 +102,18 @@ export default function AddNodeModal({ open, close, refresh }) {
                                 />
 
                                 <TextField
-                                    select
+                                    label="Returned Amount"
+                                    type="number"
+                                    value={form.returned_amount}
+                                    onChange={e => change("returned_amount", e.target.value)}
+                                />
+
+                                <TextField
                                     label="Return Status"
+                                    select
                                     value={form.return_status}
                                     onChange={e => change("return_status", e.target.value)}
                                 >
-                                    <MenuItem value="NONE">Not Returnable</MenuItem>
                                     <MenuItem value="PENDING">Pending</MenuItem>
                                     <MenuItem value="PARTIAL">Partially Returned</MenuItem>
                                     <MenuItem value="CLEARED">Cleared</MenuItem>
@@ -133,8 +124,8 @@ export default function AddNodeModal({ open, close, refresh }) {
                 )}
             </DialogContent>
 
-            <DialogActions>
-                <Button onClick={close}>Cancel</Button>
+            <DialogActions sx={{ p: 2 }}>
+                <Button color="secondary" onClick={close}>Cancel</Button>
                 <Button variant="contained" onClick={submit}>Save</Button>
             </DialogActions>
         </Dialog>

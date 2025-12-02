@@ -1,3 +1,4 @@
+// Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE } from "../api/threadApi";
@@ -9,7 +10,7 @@ import {
     Button,
     Typography,
     CircularProgress,
-    Alert
+    Alert,
 } from "@mui/material";
 
 export default function Login() {
@@ -27,17 +28,12 @@ export default function Login() {
         try {
             const res = await fetch(`${BASE}/auth/login/`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
 
-            const data = await res.json();
-
-            if (data.access) {
-                localStorage.setItem("access", data.access);
-                localStorage.setItem("refresh", data.refresh);
+            if (res.status === 200) {
                 navigate("/flow");
             } else {
                 setError("Invalid username or password");
@@ -45,30 +41,32 @@ export default function Login() {
         } catch {
             setError("Network error. Please try again.");
         }
-
         setLoading(false);
     }
 
     return (
         <Box
             sx={{
-                minHeight: "calc(100vh - 60px)",
+                minHeight: "100vh",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                background: "#f4f6f8",
+                background: "linear-gradient(180deg, #0A192F 0%, #0E2A47 100%)",
             }}
         >
             <Paper
-                elevation={6}
                 sx={{
                     p: 4,
-                    width: 350,
-                    borderRadius: 2,
+                    width: 340,
+                    borderRadius: 3,
+                    background: "rgba(14,42,71,0.7)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(100,255,218,0.15)",
+                    color: "#E6F1FF",
                 }}
             >
-                <Typography variant="h5" gutterBottom>
-                    Login
+                <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
+                    Welcome Back
                 </Typography>
 
                 {error && (
@@ -80,7 +78,6 @@ export default function Login() {
                 <TextField
                     fullWidth
                     label="Username"
-                    variant="outlined"
                     value={username}
                     onChange={(e) => setUser(e.target.value)}
                     sx={{ mb: 2 }}
@@ -90,7 +87,6 @@ export default function Login() {
                     fullWidth
                     label="Password"
                     type="password"
-                    variant="outlined"
                     value={password}
                     onChange={(e) => setPass(e.target.value)}
                     sx={{ mb: 3 }}
@@ -99,11 +95,17 @@ export default function Login() {
                 <Button
                     fullWidth
                     variant="contained"
-                    size="large"
+                    sx={{
+                        py: 1.4,
+                        fontWeight: 600,
+                        background: "#64FFDA",
+                        color: "#0A192F",
+                        "&:hover": { background: "#38E6B8" },
+                    }}
                     onClick={login}
                     disabled={loading}
                 >
-                    {loading ? <CircularProgress size={24} /> : "Login"}
+                    {loading ? <CircularProgress size={22} /> : "Login"}
                 </Button>
             </Paper>
         </Box>

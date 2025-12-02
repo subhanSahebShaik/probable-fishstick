@@ -1,26 +1,34 @@
+// Dashboard.jsx
 import { useEffect, useState } from "react";
-import { Box, Grid, Paper, Typography, CircularProgress } from "@mui/material";
-import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from "recharts";
+import {
+    Box,
+    Grid,
+    Paper,
+    Typography,
+    CircularProgress,
+} from "@mui/material";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    Tooltip,
+    CartesianGrid,
+    BarChart,
+    Bar,
+} from "recharts";
+
 import { getThreadNodes, getThreadEdges } from "../api/threadApi";
 
-const COLORS = ["#1976d2", "#d32f2f", "#388e3c", "#f9a825", "#6a1b9a"];
-
-// Hook to track window size
-function useWindowSize() {
-    const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-    useEffect(() => {
-        const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-    return size;
-}
+const COLORS = ["#64FFDA", "#FF6F61", "#38E6B8", "#F9A825", "#A277FF"];
 
 export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
-    const { width: windowWidth } = useWindowSize();
 
     useEffect(() => {
         async function load() {
@@ -35,122 +43,165 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
-                <CircularProgress />
+            <Box
+                sx={{
+                    p: 3,
+                    display: "flex",
+                    height: "80vh",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <CircularProgress sx={{ color: "#64FFDA" }} />
             </Box>
         );
     }
 
-    // ----------------------------- DATA PROCESSING -----------------------------
-    // 1. Credits vs Debits
-    const totalCredit = nodes.filter(n => n.event_type === "CREDIT").reduce((sum, n) => sum + Number(n.amount), 0);
-    const totalDebit = nodes.filter(n => n.event_type === "DEBIT").reduce((sum, n) => sum + Number(n.amount), 0);
-    const creditVsDebitData = [{ name: "Credits", value: totalCredit }, { name: "Debits", value: totalDebit }];
+    // ───────────────────────────────────────────────
+    // DATA PROCESSING
+    // ───────────────────────────────────────────────
+    const totalCredit = nodes
+        .filter(n => n.event_type === "CREDIT")
+        .reduce((s, n) => s + Number(n.amount), 0);
 
-    // 2. Monthly Trend
+    const totalDebit = nodes
+        .filter(n => n.event_type === "DEBIT")
+        .reduce((s, n) => s + Number(n.amount), 0);
+
+    const creditVsDebitData = [
+        { name: "Credits", value: totalCredit },
+        { name: "Debits", value: totalDebit },
+    ];
+
     const monthMap = {};
     nodes.forEach(n => {
-        const month = new Date(n.timestamp).toLocaleString("default", { month: "short" });
-        if (!monthMap[month]) monthMap[month] = { month, credit: 0, debit: 0 };
-        n.event_type === "CREDIT" ? monthMap[month].credit += Number(n.amount) : monthMap[month].debit += Number(n.amount);
+        const mon = new Date(n.timestamp).toLocaleString("default", { month: "short" });
+        if (!monthMap[mon]) monthMap[mon] = { month: mon, credit: 0, debit: 0 };
+
+        if (n.event_type === "CREDIT")
+            monthMap[mon].credit += Number(n.amount);
+        else
+            monthMap[mon].debit += Number(n.amount);
     });
+
     const monthlyTrendData = Object.values(monthMap);
 
-    // 3. Returnable Money
-    const returnStatusMap = { PENDING: 0, PARTIAL: 0, CLEARED: 0 };
+    const returnMap = { PENDING: 0, PARTIAL: 0, CLEARED: 0 };
     nodes.forEach(n => {
-        if (n.is_returnable) returnStatusMap[n.return_status] += Number(n.return_amount);
+        if (n.is_returnable) {
+            returnMap[n.return_status] += Number(n.return_amount);
+        }
     });
-    const returnableData = Object.keys(returnStatusMap).map(key => ({ name: key, value: returnStatusMap[key] }));
 
-    // 4. Graph stats
-    const graphStats = {
-        totalNodes: nodes.length,
-        totalEdges: edges.length,
-        avgConnections: edges.length ? (edges.length / nodes.length).toFixed(2) : 0,
+    const returnableData = Object.keys(returnMap).map(key => ({
+        name: key,
+        value: returnMap[key],
+    }));
+
+    const stats = {
+        nodes: nodes.length,
+        edges: edges.length,
+        ratio: edges.length ? (edges.length / nodes.length).toFixed(2) : 0,
     };
 
-    // ----------------------------- UI LAYOUT -----------------------------
-    const cardStyle = {
+    // ───────────────────────────────────────────────
+    // UI
+    // ───────────────────────────────────────────────
+    const card = {
         p: 3,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        borderRadius: 2,
+        borderRadius: 3,
+        background: "rgba(14,42,71,0.55)",
+        backdropFilter: "blur(14px)",
+        border: "1px solid rgba(100,255,218,0.12)",
+        boxShadow: "0 0 12px rgba(0,0,0,0.25)",
     };
-
-    // Chart widths
-    const chartWidth = windowWidth * 0.40;
 
     return (
-        <Box sx={{ width: "100%" }}>
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, padding: 3 }}>Dashboard Overview</Typography>
+        <Box sx={{ width: "100%", color: "#E6F1FF", p: 3 }}>
+            <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
+                Dashboard Overview
+            </Typography>
 
-            <Grid container spacing={3} padding={3} justifyContent="space-evenly">
+            <Grid container spacing={3}>
 
-                {/* Credits vs Debits */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={3} sx={cardStyle}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Credits vs Debits</Typography>
-                        <Box sx={{ height: 250, width: chartWidth }}>
-                            <PieChart width="100%" height={250}>
-                                <Pie
-                                    data={creditVsDebitData}
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={80}
-                                    label
-                                    dataKey="value"
-                                >
-                                    {creditVsDebitData.map((entry, index) => <Cell key={index} fill={COLORS[index]} />)}
-                                </Pie>
-                            </PieChart>
-                        </Box>
-                        <Typography><strong>Total Credit:</strong> ₹{totalCredit}</Typography>
-                        <Typography><strong>Total Debit:</strong> ₹{totalDebit}</Typography>
+                {/* Credit vs Debit */}
+                <Grid item xs={12} md={4}>
+                    <Paper sx={card}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Credits vs Debits
+                        </Typography>
+
+                        <PieChart width={300} height={280}>
+                            <Pie
+                                data={creditVsDebitData}
+                                cx="50%"
+                                cy="50%"
+                                label
+                                innerRadius={50}
+                                outerRadius={90}
+                                paddingAngle={5}
+                                dataKey="value"
+                            >
+                                {creditVsDebitData.map((entry, i) => (
+                                    <Cell key={i} fill={COLORS[i]} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+
+                        <Typography sx={{ mt: 1 }}>
+                            <b>Total Credit:</b> ₹{totalCredit}
+                        </Typography>
+                        <Typography>
+                            <b>Total Debit:</b> ₹{totalDebit}
+                        </Typography>
                     </Paper>
                 </Grid>
 
                 {/* Monthly Trend */}
-                <Grid item xs={12} sm={6} md={8}>
-                    <Paper elevation={3} sx={cardStyle}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Monthly Financial Trend</Typography>
-                        <Box sx={{ height: 300, width: chartWidth }}>
-                            <LineChart width="100%" height={300} data={monthlyTrendData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="month" />
-                                <YAxis />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="credit" stroke="#1976d2" strokeWidth={2} />
-                                <Line type="monotone" dataKey="debit" stroke="#d32f2f" strokeWidth={2} />
-                            </LineChart>
-                        </Box>
+                <Grid item xs={12} md={8}>
+                    <Paper sx={card}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Monthly Trend
+                        </Typography>
+
+                        <LineChart width={600} height={300} data={monthlyTrendData}>
+                            <CartesianGrid stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="month" stroke="#A8B2D1" />
+                            <YAxis stroke="#A8B2D1" />
+                            <Tooltip />
+                            <Line dataKey="credit" stroke="#64FFDA" strokeWidth={2} />
+                            <Line dataKey="debit" stroke="#FF6F61" strokeWidth={2} />
+                        </LineChart>
                     </Paper>
                 </Grid>
 
-                {/* Returnable Money */}
-                <Grid item xs={12} sm={6} md={6}>
-                    <Paper elevation={3} sx={cardStyle}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Returnable Money Overview</Typography>
-                        <Box sx={{ height: 300, width: chartWidth }}>
-                            <BarChart width="100%" height={300} data={returnableData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="value" fill="#6a1b9a" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </Box>
+                {/* Returnable */}
+                <Grid item xs={12} md={6}>
+                    <Paper sx={card}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Returnable Money
+                        </Typography>
+
+                        <BarChart width={500} height={300} data={returnableData}>
+                            <CartesianGrid stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="name" stroke="#A8B2D1" />
+                            <YAxis stroke="#A8B2D1" />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#A277FF" radius={[5, 5, 0, 0]} />
+                        </BarChart>
                     </Paper>
                 </Grid>
 
                 {/* Graph Stats */}
-                <Grid item xs={12} sm={6} md={6}>
-                    <Paper elevation={3} sx={cardStyle} style={{ width: chartWidth }}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Graph Structure Insights</Typography>
-                        <Typography>Total Nodes: {graphStats.totalNodes}</Typography>
-                        <Typography>Total Edges: {graphStats.totalEdges}</Typography>
-                        <Typography>Avg. Connections per Node: {graphStats.avgConnections}</Typography>
+                <Grid item xs={12} md={6}>
+                    <Paper sx={card}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Graph Insights
+                        </Typography>
+
+                        <Typography>Total Nodes: {stats.nodes}</Typography>
+                        <Typography>Total Edges: {stats.edges}</Typography>
+                        <Typography>Average Connections: {stats.ratio}</Typography>
                     </Paper>
                 </Grid>
 

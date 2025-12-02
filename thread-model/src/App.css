@@ -1,17 +1,32 @@
 body {
   margin: 0;
-  background: #fafafa;
-  font-family: sans-serif;
+  padding: 0;
+  background: linear-gradient(180deg, #0A192F 0%, #0E2A47 50%, #103B58 100%);
+  color: #E6F1FF;
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
 }
 
-button {
-  background: #222;
-  color: white;
-  padding: 7px 12px;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
+::-webkit-scrollbar {
+  width: 8px;
 }
-button:hover {
-  background: black;
+::-webkit-scrollbar-thumb {
+  background: #103B58;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64FFDA;
+}
+
+/* MUI Dialog Backdrop (dark underwater depth) */
+.MuiBackdrop-root {
+  background: rgba(2, 12, 24, 0.75) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+/* Autocomplete list style */
+.MuiAutocomplete-paper {
+  background: rgba(10, 25, 47, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #E6F1FF !important;
 }

@@ -1,16 +1,13 @@
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
+// EditNodeModal.jsx
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    TextField, MenuItem, Checkbox, FormControlLabel, Button
+} from "@mui/material";
 import { useState } from "react";
 import { updateThreadNode } from "../api/threadApi";
 
 export default function EditNodeModal({ node, close, refresh }) {
+
     const [form, setForm] = useState({
         event_name: node.event_name,
         event_type: node.event_type,
@@ -23,23 +20,24 @@ export default function EditNodeModal({ node, close, refresh }) {
         return_status: node.return_status,
     });
 
-    function change(k, v) {
-        setForm({ ...form, [k]: v });
-    }
-
-    async function submit() {
-        await updateThreadNode(node.id, form);
-        refresh();
-        close();
-    }
+    const change = (k, v) => setForm({ ...form, [k]: v });
 
     const isDebit = form.event_type === "DEBIT";
 
+    const submit = async () => {
+        await updateThreadNode(node.id, form);
+        refresh();
+        close();
+    };
+
     return (
         <Dialog open={true} onClose={close} maxWidth="sm" fullWidth>
-            <DialogTitle>Edit Node</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 600 }}>Edit Node</DialogTitle>
 
-            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <DialogContent
+                dividers
+                sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+            >
                 <TextField
                     label="Event Name"
                     value={form.event_name}
@@ -68,7 +66,6 @@ export default function EditNodeModal({ node, close, refresh }) {
                     type="number"
                     value={form.balance}
                     onChange={e => change("balance", e.target.value)}
-                    helperText="Update current balance for this medium after this event"
                 />
 
                 <TextField
@@ -113,7 +110,6 @@ export default function EditNodeModal({ node, close, refresh }) {
                                     value={form.return_status}
                                     onChange={e => change("return_status", e.target.value)}
                                 >
-                                    <MenuItem value="NONE">Not Returnable</MenuItem>
                                     <MenuItem value="PENDING">Pending</MenuItem>
                                     <MenuItem value="PARTIAL">Partially Returned</MenuItem>
                                     <MenuItem value="CLEARED">Cleared</MenuItem>
@@ -124,8 +120,8 @@ export default function EditNodeModal({ node, close, refresh }) {
                 )}
             </DialogContent>
 
-            <DialogActions>
-                <Button onClick={close}>Cancel</Button>
+            <DialogActions sx={{ p: 2 }}>
+                <Button color="secondary" onClick={close}>Cancel</Button>
                 <Button variant="contained" onClick={submit}>Save</Button>
             </DialogActions>
         </Dialog>

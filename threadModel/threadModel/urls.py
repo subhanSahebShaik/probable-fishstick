@@ -17,21 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from threadApp import views as threads
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # JWT Auth
-    path("api/auth/login/", TokenObtainPairView.as_view(),
-         name="token_obtain_pair"),
-    path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # SECURE COOKIE AUTH
+    path("api/auth/login/", threads.cookie_login, name="cookie_login"),
+    path("api/auth/refresh/", threads.cookie_refresh, name="cookie_refresh"),
+    path("api/auth/check/", threads.auth_check, name="auth_check"),
 
-    # Thread Nodes
+    # Thread API
     path("api/thread/nodes/", threads.thread_nodes),
     path("api/thread/nodes/<uuid:pk>/", threads.thread_node_detail),
 
-    # Thread Edges
     path("api/thread/edges/", threads.thread_edges),
     path("api/thread/edges/<uuid:pk>/", threads.thread_edge_detail),
 ]

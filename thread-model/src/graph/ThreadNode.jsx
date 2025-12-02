@@ -1,3 +1,4 @@
+// ThreadNode.jsx
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
@@ -6,66 +7,61 @@ import { Handle, Position } from "reactflow";
 export default function ThreadNodeComponent({ data }) {
     const isCredit = data.event_type === "CREDIT";
 
+    const bg = isCredit
+        ? "linear-gradient(135deg, #0E5035 0%, #38E6B8 100%)"
+        : "linear-gradient(135deg, #501A1A 0%, #FF6F61 100%)";
+
     return (
         <Box
             sx={{
                 width: 240,
-                padding: 1.5,
-                borderRadius: 2,
-                border: "1px solid #444",
-                backgroundColor: isCredit ? "#d2ffe0" : "#ffe0e0",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-                cursor: "pointer",
+                p: 2,
+                borderRadius: 3,
+                background: bg,
+                color: "white",
+                boxShadow: "0 0 15px rgba(0,0,0,0.4)",
+                border: "1px solid rgba(255,255,255,0.15)",
             }}
         >
-            <Handle type="target" position={Position.Top} style={{ background: "#333" }} />
-            <Handle type="source" position={Position.Bottom} style={{ background: "#333" }} />
+            <Handle type="target" position={Position.Top} />
+            <Handle type="source" position={Position.Bottom} />
 
-            {/* Event Name */}
             <Typography
                 variant="subtitle1"
-                fontWeight="600"
-                sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                sx={{
+                    fontWeight: 700,
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                }}
             >
                 {data.event_name}
             </Typography>
 
-            {/* Amount */}
-            <Typography variant="body1" sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
+            <Typography sx={{ mt: 0.5, fontWeight: 500 }}>
                 ₹ {data.amount}
             </Typography>
 
-            {/* Balance */}
-            <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, fontSize: "0.85rem", color: "#333" }}
-            >
+            <Typography sx={{ mt: 0.5, fontSize: "0.8rem" }}>
                 Balance: ₹ {Number(data.balance || 0).toFixed(2)}
             </Typography>
 
-            {/* Timestamp */}
-            <Typography variant="caption" sx={{ fontSize: "0.75rem", color: "#888" }}>
+            <Typography sx={{ opacity: 0.8, fontSize: "0.7rem", mt: 1 }}>
                 {new Date(data.timestamp).toLocaleString()}
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                {data.return_status !== "NONE" && (
-                    <Chip
-                        size="small"
-                        variant="outlined"
-                        label={data.return_status}
-                        color={
-                            data.return_status === "CLEARED"
-                                ? "success"
-                                : data.return_status === "PARTIAL"
-                                    ? "warning"
-                                    : "error"
-                        }
-                    />
-                )}
-            </Box>
+            {data.return_status !== "NONE" && (
+                <Chip
+                    size="small"
+                    label={data.return_status}
+                    sx={{
+                        mt: 1,
+                        background: "rgba(255,255,255,0.2)",
+                        color: "white",
+                        border: "1px solid rgba(255,255,255,0.4)",
+                    }}
+                />
+            )}
         </Box>
     );
 }

@@ -1,10 +1,8 @@
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
+// AddEdgeModal.jsx
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    Button, Autocomplete, TextField
+} from "@mui/material";
 import { useState } from "react";
 import { createThreadEdge } from "../api/threadApi";
 
@@ -24,39 +22,48 @@ export default function AddEdgeModal({ open, close, refresh, nodes }) {
     };
 
     return (
-        <Dialog open={open} onClose={close} maxWidth="sm" fullWidth>
-            <DialogTitle>Add Edge</DialogTitle>
+        <Dialog
+            open={open}
+            onClose={close}
+            maxWidth="sm"
+            fullWidth
+        >
+            <DialogTitle sx={{ fontWeight: 600 }}>
+                Add Edge
+            </DialogTitle>
 
-            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
-
-                {/* FROM NODE */}
+            <DialogContent
+                dividers
+                sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+            >
                 <Autocomplete
                     options={nodes}
                     getOptionLabel={(option) =>
                         `${option.event_name} (₹${option.amount})`
                     }
-                    onChange={(e, value) => setForm({ ...form, from_node: value })}
+                    onChange={(e, v) => setForm({ ...form, from_node: v })}
                     renderInput={(params) => (
                         <TextField {...params} label="From Node" />
                     )}
                 />
 
-                {/* TO NODE */}
                 <Autocomplete
                     options={nodes}
                     getOptionLabel={(option) =>
                         `${option.event_name} (₹${option.amount})`
                     }
-                    onChange={(e, value) => setForm({ ...form, to_node: value })}
+                    onChange={(e, v) => setForm({ ...form, to_node: v })}
                     renderInput={(params) => (
                         <TextField {...params} label="To Node" />
                     )}
                 />
             </DialogContent>
 
-            <DialogActions>
-                <Button onClick={close}>Cancel</Button>
-                <Button variant="contained" onClick={submit}>Save</Button>
+            <DialogActions sx={{ p: 2 }}>
+                <Button onClick={close} color="secondary">Cancel</Button>
+                <Button variant="contained" onClick={submit}>
+                    Save
+                </Button>
             </DialogActions>
         </Dialog>
     );
