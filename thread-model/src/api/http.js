@@ -1,3 +1,6 @@
+// http.js
+import { BASE } from "./threadApi";
+
 export async function apiFetch(url, options = {}) {
     return fetch(url, {
         credentials: "include",
