@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { BASE } from "../api/threadApi";
-import LoadingSpinner from "./LoadingSpinner";   // you must create this OR replace with text
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function PrivateRoute({ children }) {
     const [allowed, setAllowed] = useState(null);
@@ -14,7 +14,7 @@ export default function PrivateRoute({ children }) {
             .catch(() => setAllowed(false));
     }, []);
 
-    if (allowed === null) return <LoadingSpinner />;   // or return "Loading..."
+    if (allowed === null) return <LoadingSpinner />;
 
     return allowed ? children : <Navigate to="/login" replace />;
 }

@@ -21,12 +21,12 @@ from threadApp import views as threads
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # SECURE COOKIE AUTH
+    # Cookie based JWT Auth
     path("api/auth/login/", threads.cookie_login, name="cookie_login"),
     path("api/auth/refresh/", threads.cookie_refresh, name="cookie_refresh"),
     path("api/auth/check/", threads.auth_check, name="auth_check"),
 
-    # Thread API
+    # Thread APIs (protected)
     path("api/thread/nodes/", threads.thread_nodes),
     path("api/thread/nodes/<uuid:pk>/", threads.thread_node_detail),
 
